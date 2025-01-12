@@ -9,6 +9,7 @@ ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 
 
 app = Flask(__name__)
+
 if ENVIRONMENT == "production":
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
 else:
@@ -17,7 +18,6 @@ else:
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
-print(f"{app.config=}")
 
 
 @app.route("/")
