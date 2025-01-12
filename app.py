@@ -17,6 +17,7 @@ else:
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
 db.init_app(app)
+print(app.config)
 
 
 @app.route("/")
