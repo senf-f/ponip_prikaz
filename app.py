@@ -30,7 +30,7 @@ def index():
         Property.datum_zavrsetka_nadmetanja,
         SalesInfo.iznos_najvise_ponude,
         SalesInfo.status_nadmetanja,
-    ).join(SalesInfo, Property.id == SalesInfo.id).all()
+    ).outerjoin(SalesInfo, Property.id == SalesInfo.id).all()
 
     print(f"[MM] Fetched {len(combined_data)} rows from the database.")
     return render_template("index.html", data=combined_data)
