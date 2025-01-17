@@ -3,43 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Properties and Sales Info</title>
+    <title>Informacije o dražbi</title>
 </head>
 <body>
-    <h1>Properties and Sales Information</h1>
+    <h1>Informacije o dražbi</h1>
     <table border="1">
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Nadležno Tijelo</th>
                 <th>Opis</th>
-                <th>Iznos Najviše Ponude</th>
-                <th>Status Nadmetanja</th>
+                <th>Utvrđena vrijednost</th>
+                <th>Početna cijena</th>
+                <th>Završetak nadmetanja</th>
+                <th>Iznos najviše ponude</th>
+                <th>Status nadmetanja</th>
             </tr>
         </thead>
         <tbody>
             {% for row in data %}
             <tr>
                 <td>{{ row.id }}</td>
-                <td>{{ row.nadlezno_tijelo }}</td>
                 <td>{{ row.opis }}</td>
-                <td>{{ row.vrsta_predmeta }}</td>
-                <td>{{ row.opseg_imovine }}</td>
                 <td>{{ row.utvrdjena_vrijednost }}</td>
-                <td>{{ row.napomena_uz_detalje }}</td>
-                <td>{{ row.broj_drazbe }}</td>
-                <td>{{ row.datum_odluke }}</td>
-                <td>{{ row.datum_pocetka }}</td>
-                <td>{{ row.datum_pocetka_nadmetanja }}</td>
                 <td>{{ row.datum_zavrsetka_nadmetanja }}</td>
-                <td>{{ row.ostali_uvjeti_prodaje }}</td>
-                <td>{{ row.min_cijena }}</td>
                 <td>{{ row.pocetna_cijena }}</td>
-                <td>{{ row.iznos_drazbenog_koraka }}</td>
-                <td>{{ row.jamcevina }}</td>
-                <td>{{ row.ostali_uvjeti_za_jamcevinu }}</td>
-                <td>{{ row.napomena_uz_uvjete_prodaje }}</td>
-                <td>{{ row.razgledavanje }}</td>
                 <td>{{ row.iznos_najvise_ponude or "N/A" }}</td>
                 <td>{{ row.status_nadmetanja }}</td>
             </tr>
