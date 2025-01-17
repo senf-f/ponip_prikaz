@@ -32,6 +32,7 @@ def index():
         SalesInfo.status_nadmetanja,
     ).join(SalesInfo, Property.id == SalesInfo.id).all()
 
+    print(f"[MM] Fetched {len(combined_data)} rows from the database.")
     return render_template("index.html", data=combined_data)
 
 if __name__ == "__main__":
