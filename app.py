@@ -24,8 +24,10 @@ db.init_app(app)
 def index():
     combined_data = db.session.query(
         Property.id,
-        Property.nadlezno_tijelo,
         Property.opis,
+        Property.utvrdjena_vrijednost,
+        Property.pocetna_cijena,
+        Property.datum_zavrsetka_nadmetanja,
         SalesInfo.iznos_najvise_ponude,
         SalesInfo.status_nadmetanja,
     ).join(SalesInfo, Property.id == SalesInfo.id).all()
