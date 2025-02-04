@@ -28,6 +28,7 @@ def index():
         Property.utvrdjena_vrijednost,
         Property.pocetna_cijena,
         Property.datum_zavrsetka_nadmetanja,
+        SalesInfo.broj_uplatitelja,
         SalesInfo.iznos_najvise_ponude,
         SalesInfo.status_nadmetanja,
     ).outerjoin(SalesInfo, Property.id == SalesInfo.id).all()
