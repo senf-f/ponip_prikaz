@@ -1,5 +1,7 @@
 import os
 from flask import Flask, render_template
+from sqlalchemy import Integer, cast
+
 from models import db, Property, SalesInfo
 from dotenv import load_dotenv
 
@@ -31,11 +33,9 @@ def index():
         SalesInfo.broj_uplatitelja,
         SalesInfo.iznos_najvise_ponude,
         SalesInfo.status_nadmetanja,
-    ).join(SalesInfo, Property.id == SalesInfo.id).all()
+    ).outerjoin(SalesInfo, Property.id == cast(SalesInfo.id, Integer)).all()
 
     print(f"[MM] Fetched {len(combined_data)} rows from the database.")
-    for row in combined_data:
-        print(row)
     return render_template("index.html", data=combined_data)
 
 if __name__ == "__main__":
