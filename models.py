@@ -28,11 +28,12 @@ class Property(db.Model):
     razgledavanje = db.Column(db.String)
     napomena_uz_uvjete_prodaje = db.Column(db.String)
 
+    sales_info = db.relationship("SalesInfo", backref="property", lazy=True, uselist=False)
 
 class SalesInfo(db.Model):
     __tablename__ = "sales_info"
 
     id = db.Column(db.Integer, db.ForeignKey("properties.id"), primary_key=True)
     iznos_najvise_ponude = db.Column(db.Float)
-    status_nadmetanja = db.Column(db.String, nullable=False)
+    status_nadmetanja = db.Column(db.String)
     broj_uplatitelja = db.Column(db.Integer)
