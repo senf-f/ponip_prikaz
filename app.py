@@ -31,7 +31,7 @@ def index():
         SalesInfo.broj_uplatitelja,
         SalesInfo.iznos_najvise_ponude,
         SalesInfo.status_nadmetanja,
-    ).outerjoin(SalesInfo, Property.id == SalesInfo.id).all()
+    ).join(SalesInfo, Property.id == SalesInfo.id).all()
 
     print(f"[MM] Fetched {len(combined_data)} rows from the database.")
     for row in combined_data:
