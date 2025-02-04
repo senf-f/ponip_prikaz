@@ -34,6 +34,8 @@ def index():
     ).outerjoin(SalesInfo, Property.id == SalesInfo.id).all()
 
     print(f"[MM] Fetched {len(combined_data)} rows from the database.")
+    for row in combined_data:
+        print(row)
     return render_template("index.html", data=combined_data)
 
 if __name__ == "__main__":
