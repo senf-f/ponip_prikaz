@@ -58,14 +58,14 @@
                 let cellA = rowA.cells[n].innerText.trim();
                 let cellB = rowB.cells[n].innerText.trim();
 
-                // Check if sorting column is a date (column index 4 in your case)
+                // Handle Date Sorting (Column 4)
                 if (n === 4) {
                     let dateA = parseDate(cellA);
                     let dateB = parseDate(cellB);
                     return asc ? dateA - dateB : dateB - dateA;
                 }
 
-                // Convert to numbers if applicable
+                // Handle Numeric Sorting
                 let numA = parseFloat(cellA.replace(',', ''));
                 let numB = parseFloat(cellB.replace(',', ''));
 
@@ -84,10 +84,10 @@
             table.dataset.sortOrder = asc ? "asc" : "desc";
         }
 
-        // Function to parse dates in "DD.MM.YYYY" format
+        // ✅ Corrected function to parse 'DD.MM.YYYY' format into a Date object
         function parseDate(dateStr) {
             let parts = dateStr.split(".");
-            return new Date(parts[2], parts[1] - 1, parts[0]); // YYYY, MM (0-based), DD
+            return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
         }
     </script>
 
