@@ -28,7 +28,7 @@
                 <td>{{ row.opis }}</td>
                 <td>{{ row.utvrdjena_vrijednost }}</td>
                 <td>{{ row.pocetna_cijena }}</td>
-                <td>{{ row.datum_zavrsetka_nadmetanja }}</td>
+                <td>{{ row.datum_zavrsetka_nadmetanja.strftime('%d.%m.%Y') }}</td>
                 <td>{{ row.broj_uplatitelja }}</td>
                 <td>{{ row.iznos_najvise_ponude or "N/A" }}</td>
                 <td>{{ row.status_nadmetanja }}</td>
