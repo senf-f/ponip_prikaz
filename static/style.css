@@ -37,3 +37,42 @@ button {
 button:hover {
     background: #9b69d2;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 18px;
+    text-align: center;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+th, td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #a6c76c;  /* Greenish-Yellow */
+    color: #333;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+tr:nth-child(even) {
+    background-color: #2a2a2a; /* Darker row for contrast */
+}
+
+tr:nth-child(odd) {
+    background-color: #1e1e1e; /* Slightly lighter */
+}
+
+td {
+    color: white;
+}
+
+tr:hover {
+    background-color: #444; /* Highlight row on hover */
+}
