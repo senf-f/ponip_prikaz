@@ -14,7 +14,7 @@
     <label for="statusFilter">Filter by Status nadmetanja:</label>
     <select id="statusFilter" onchange="filterTable()">
         <option value="all">All</option>
-        {% for row in data|groupby('status_nadmetanja') %}
+        {% for row in data|selectattr('status_nadmetanja')|groupby('status_nadmetanja') %}
         <option value="{{ row.grouper }}">{{ row.grouper }}</option>
         {% endfor %}
     </select>
