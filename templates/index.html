@@ -9,16 +9,26 @@
 <body>
     <h1>Informacije o dražbi</h1>
     <h4>Ukupno redaka: {{ data|length }}</h4>
-    <table border="1">
+
+    <!-- Filter Dropdown -->
+    <label for="statusFilter">Filter by Status nadmetanja:</label>
+    <select id="statusFilter" onchange="filterTable()">
+        <option value="all">All</option>
+        {% for row in data|groupby('status_nadmetanja') %}
+        <option value="{{ row.grouper }}">{{ row.grouper }}</option>
+        {% endfor %}
+    </select>
+
+    <table id="auctionTable" border="1">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Opis</th>
                 <th>Utvrđena vrijednost</th>
-                <th>Početna cijena</th>
-                <th>Završetak nadmetanja</th>
-                <th>Broj uplatitelja</th>
-                <th>Iznos najviše ponude</th>
+                <th onclick="sortTable(3)">Početna cijena ⬍</th>
+                <th onclick="sortTable(4)">Završetak nadmetanja ⬍</th>
+                <th onclick="sortTable(5)">Broj uplatitelja ⬍</th>
+                <th onclick="sortTable(6)">Iznos najviše ponude ⬍</th>
                 <th>Status nadmetanja</th>
             </tr>
         </thead>
@@ -37,5 +47,36 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <script>
+        function sortTable(n) {
+            let table = document.getElementById("auctionTable");
+            let rows = Array.from(table.rows).slice(1);
+            let asc = table.dataset.sortOrder !== "asc";
+
+            rows.sort((rowA, rowB) => {
+                let cellA = rowA.cells[n].innerText.trim();
+                let cellB = rowB.cells[n].innerText.trim();
+                let numA = parseFloat(cellA.replace(',', ''));
+                let numB = parseFloat(cellB.replace(',', ''));
+
+                return (!isNaN(numA) && !isNaN(numB)) ? (asc ? numA - numB : numB - numA) : (asc ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA));
+            });
+
+            rows.forEach(row => table.tBodies[0].appendChild(row));
+            table.dataset.sortOrder = asc ? "asc" : "desc";
+        }
+
+        function filterTable() {
+            let filterValue = document.getElementById("statusFilter").value.toLowerCase();
+            let rows = document.getElementById("auctionTable").getElementsByTagName("tr");
+
+            for (let i = 1; i < rows.length; i++) {
+                let statusCell = rows[i].cells[7].innerText.toLowerCase();
+                rows[i].style.display = (filterValue === "all" || statusCell === filterValue) ? "" : "none";
+            }
+        }
+    </script>
 </body>
 </html>
+
