@@ -57,26 +57,41 @@
             rows.sort((rowA, rowB) => {
                 let cellA = rowA.cells[n].innerText.trim();
                 let cellB = rowB.cells[n].innerText.trim();
+
+                // Check if sorting column is a date (column index 4 in your case)
+                if (n === 4) {
+                    let dateA = parseDate(cellA);
+                    let dateB = parseDate(cellB);
+                    return asc ? dateA - dateB : dateB - dateA;
+                }
+
+                // Convert to numbers if applicable
                 let numA = parseFloat(cellA.replace(',', ''));
                 let numB = parseFloat(cellB.replace(',', ''));
 
-                return (!isNaN(numA) && !isNaN(numB)) ? (asc ? numA - numB : numB - numA) : (asc ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA));
+                if (!isNaN(numA) && !isNaN(numB)) {
+                    return asc ? numA - numB : numB - numA;
+                } else {
+                    return asc ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+                }
             });
 
-            rows.forEach(row => table.tBodies[0].appendChild(row));
+            // Append sorted rows back to the table
+            for (let row of rows) {
+                table.tBodies[0].appendChild(row);
+            }
+
             table.dataset.sortOrder = asc ? "asc" : "desc";
         }
 
-        function filterTable() {
-            let filterValue = document.getElementById("statusFilter").value.toLowerCase();
-            let rows = document.getElementById("auctionTable").getElementsByTagName("tr");
-
-            for (let i = 1; i < rows.length; i++) {
-                let statusCell = rows[i].cells[7].innerText.toLowerCase();
-                rows[i].style.display = (filterValue === "all" || statusCell === filterValue) ? "" : "none";
-            }
+        // Function to parse dates in "DD.MM.YYYY" format
+        function parseDate(dateStr) {
+            let parts = dateStr.split(".");
+            return new Date(parts[2], parts[1] - 1, parts[0]); // YYYY, MM (0-based), DD
         }
     </script>
+
+
 </body>
 </html>
 
