@@ -50,8 +50,7 @@ table {
 }
 
 th, td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Lighter border for subtle separation */
 }
 
 th {
@@ -75,4 +74,10 @@ td {
 
 tr:hover {
     background-color: #444; /* Highlight row on hover */
+}
+
+@media (max-width: 600px) {
+    .table-container {
+        overflow-x: auto;
+    }
 }
