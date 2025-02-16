@@ -51,6 +51,7 @@ table {
 
 th, td {
     border: 1px solid rgba(255, 255, 255, 0.2); /* Lighter border for subtle separation */
+    padding: 16px 20px; /* More space for better readability */
 }
 
 th {
