@@ -7,89 +7,100 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Informacije o dražbi</h1>
-    <h4>Ukupno redaka: {{ data|length }}</h4>
+<h1>Informacije o dražbi</h1>
+<h4>Ukupno redaka: {{ data|length }}</h4>
 
-    <!-- Filter Dropdown -->
-    <label for="statusFilter">Filter by Status nadmetanja:</label>
-    <select id="statusFilter" onchange="filterTable()">
-        <option value="all">All</option>
-        {% for row in data|selectattr('status_nadmetanja')|groupby('status_nadmetanja') %}
-        <option value="{{ row.grouper }}">{{ row.grouper }}</option>
-        {% endfor %}
-    </select>
+<!-- Filter Dropdown -->
+<label for="statusFilter">Filter by Status nadmetanja:</label>
+<select id="statusFilter" onchange="filterTable()">
+    <option value="all">All</option>
+    {% for row in data | groupby('status_nadmetanja') %}
+    <option value="{{ row.grouper }}">{{ row.grouper }}</option>
+    {% endfor %}
+</select>
 
-    <table id="auctionTable" border="1">
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Opis</th>
-                <th>Utvrđena vrijednost</th>
-                <th onclick="sortTable(3)">Početna cijena ⬍</th>
-                <th onclick="sortTable(4)">Završetak nadmetanja ⬍</th>
-                <th onclick="sortTable(5)">Broj uplatitelja ⬍</th>
-                <th onclick="sortTable(6)">Iznos najviše ponude ⬍</th>
-                <th>Status nadmetanja</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in data %}
-            <tr>
-                <td>{{ row.id }}</td>
-                <td>{{ row.opis }}<br><a href="{{ row.url }}" target="_blank">{{ row.url }}</a></td>
-                <td>{{ row.utvrdjena_vrijednost }}</td>
-                <td>{{ row.pocetna_cijena }}</td>
-                <td>{{ row.datum_zavrsetka_nadmetanja.strftime('%d.%m.%Y') }}</td>
-                <td>{{ row.broj_uplatitelja }}</td>
-                <td>{{ row.iznos_najvise_ponude or "N/A" }}</td>
-                <td>{{ row.status_nadmetanja }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+<table id="auctionTable" border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Opis</th>
+        <th>Utvrđena vrijednost</th>
+        <th onclick="sortTable(3)">Početna cijena ⬍</th>
+        <th onclick="sortTable(4)">Završetak nadmetanja ⬍</th>
+        <th onclick="sortTable(5)">Broj uplatitelja ⬍</th>
+        <th onclick="sortTable(6)">Iznos najviše ponude ⬍</th>
+        <th>Status nadmetanja</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in data %}
+    <tr>
+        <td>{{ row.id }}</td>
+        <td>{{ row.opis }}<br><a href="{{ row.url }}" target="_blank">{{ row.url }}</a></td>
+        <td>{{ row.utvrdjena_vrijednost }}</td>
+        <td>{{ row.pocetna_cijena }}</td>
+        <td>{{ row.datum_zavrsetka_nadmetanja.strftime('%d.%m.%Y') }}</td>
+        <td>{{ row.broj_uplatitelja }}</td>
+        <td>{{ row.iznos_najvise_ponude or "N/A" }}</td>
+        <td>{{ row.status_nadmetanja }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
-    <script>
-        function sortTable(n) {
-            let table = document.getElementById("auctionTable");
-            let rows = Array.from(table.rows).slice(1);
-            let asc = table.dataset.sortOrder !== "asc";
+<script>
+    function sortTable(n) {
+        let table = document.getElementById("auctionTable");
+        let rows = Array.from(table.rows).slice(1);
+        let asc = table.dataset.sortOrder !== "asc";
 
-            rows.sort((rowA, rowB) => {
-                let cellA = rowA.cells[n].innerText.trim();
-                let cellB = rowB.cells[n].innerText.trim();
+        rows.sort((rowA, rowB) => {
+            let cellA = rowA.cells[n].innerText.trim();
+            let cellB = rowB.cells[n].innerText.trim();
 
-                // Handle Date Sorting (Column 4)
-                if (n === 4) {
-                    let dateA = parseDate(cellA);
-                    let dateB = parseDate(cellB);
-                    return asc ? dateA - dateB : dateB - dateA;
-                }
-
-                // Handle Numeric Sorting
-                let numA = parseFloat(cellA.replace(',', ''));
-                let numB = parseFloat(cellB.replace(',', ''));
-
-                if (!isNaN(numA) && !isNaN(numB)) {
-                    return asc ? numA - numB : numB - numA;
-                } else {
-                    return asc ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
-                }
-            });
-
-            // Append sorted rows back to the table
-            for (let row of rows) {
-                table.tBodies[0].appendChild(row);
+            // Handle Date Sorting (Column 4)
+            if (n === 4) {
+                let dateA = parseDate(cellA);
+                let dateB = parseDate(cellB);
+                return asc ? dateA - dateB : dateB - dateA;
             }
 
-            table.dataset.sortOrder = asc ? "asc" : "desc";
+            // Handle Numeric Sorting
+            let numA = parseFloat(cellA.replace(',', ''));
+            let numB = parseFloat(cellB.replace(',', ''));
+
+            if (!isNaN(numA) && !isNaN(numB)) {
+                return asc ? numA - numB : numB - numA;
+            } else {
+                return asc ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+            }
+        });
+
+        // Append sorted rows back to the table
+        for (let row of rows) {
+            table.tBodies[0].appendChild(row);
         }
 
-        // ✅ Corrected function to parse 'DD.MM.YYYY' format into a Date object
-        function parseDate(dateStr) {
-            let parts = dateStr.split(".");
-            return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+        table.dataset.sortOrder = asc ? "asc" : "desc";
+    }
+
+    // ✅ Corrected function to parse 'DD.MM.YYYY' format into a Date object
+    function parseDate(dateStr) {
+        let parts = dateStr.split(".");
+        return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+    }
+
+    function filterTable() {
+        let filter = document.getElementById("statusFilter").value.toLowerCase();
+        let table = document.getElementById("auctionTable");
+        let rows = table.getElementsByTagName("tr");
+
+    for (let i = 1; i < rows.length; i++) {
+        let status = rows[i].cells[7].innerText.toLowerCase();
+        rows[i].style.display = (filter === "all" || status === filter) ? "" : "none";
         }
-    </script>
+    }
+</script>
 
 
 </body>
