@@ -36,7 +36,7 @@
             {% for row in data %}
             <tr>
                 <td>{{ row.id }}</td>
-                <td>{{ row.opis }}</td>
+                <td>{{ row.opis }}<a>{{ row.url }}</a>p></td>
                 <td>{{ row.utvrdjena_vrijednost }}</td>
                 <td>{{ row.pocetna_cijena }}</td>
                 <td>{{ row.datum_zavrsetka_nadmetanja.strftime('%d.%m.%Y') }}</td>

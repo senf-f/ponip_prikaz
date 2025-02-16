@@ -37,3 +37,4 @@ class SalesInfo(db.Model):
     iznos_najvise_ponude = db.Column(db.String)
     status_nadmetanja = db.Column(db.String)
     broj_uplatitelja = db.Column(db.Integer)
+    url = db.Column(db.String)
