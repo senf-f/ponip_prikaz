@@ -24,10 +24,9 @@
             <label for="statusFilter">Status</label>
             <select id="statusFilter" class="filter-select" onchange="filterTable()">
                 <option value="all">Svi statusi</option>
-                <option value="Unknown">Nepoznato</option>
-                {% for row in data | selectattr("status_nadmetanja") | groupby("status_nadmetanja") %}
-                <option value="{{ row.grouper }}">{{ row.grouper }}</option>
-                {% endfor %}
+                <option value="aktivan">Aktivan</option>
+                <option value="ističe">Ističe</option>
+                <option value="istekao">Istekao</option>
             </select>
         </div>
     </div>
@@ -63,10 +62,13 @@
                     <td class="col-number">{{ row.broj_uplatitelja or "—" }}</td>
                     <td class="col-currency">{{ row.iznos_najvise_ponude or "—" }}</td>
                     <td>
-                        {% if row.status_nadmetanja %}
-                        <span class="status-badge {% if 'završ' in (row.status_nadmetanja|lower) %}completed{% elif 'aktiv' in (row.status_nadmetanja|lower) %}active{% elif 'neuspje' in (row.status_nadmetanja|lower) %}failed{% else %}unknown{% endif %}">
-                            {{ row.status_nadmetanja }}
-                        </span>
+                        {% set end_date = row.datum_zavrsetka_nadmetanja.date() if row.datum_zavrsetka_nadmetanja else none %}
+                        {% if end_date and end_date > one_week_from_now %}
+                        <span class="status-badge active">Aktivan</span>
+                        {% elif end_date and end_date >= today %}
+                        <span class="status-badge expiring">Ističe</span>
+                        {% elif end_date %}
+                        <span class="status-badge failed">Istekao</span>
                         {% else %}
                         <span class="status-badge unknown">N/A</span>
                         {% endif %}

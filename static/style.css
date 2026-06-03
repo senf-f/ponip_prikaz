@@ -319,6 +319,12 @@ tbody tr:nth-child(even):hover {
     border: 1px solid rgba(91, 155, 213, 0.2);
 }
 
+.status-badge.expiring {
+    background: rgba(230, 180, 50, 0.1);
+    color: #e6b432;
+    border: 1px solid rgba(230, 180, 50, 0.2);
+}
+
 .status-badge.failed {
     background: rgba(232, 84, 84, 0.1);
     color: var(--negative);

@@ -1,4 +1,5 @@
 import os
+from datetime import datetime, timedelta
 
 from dotenv import load_dotenv
 from flask import Flask, render_template
@@ -35,8 +36,11 @@ def index():
         SalesInfo.status_nadmetanja,
     ).outerjoin(SalesInfo, Property.id == cast(SalesInfo.id, Integer)).all()
 
+    today = datetime.now().date()
+    one_week_from_now = today + timedelta(weeks=1)
+
     print(f"[MM] Fetched {len(combined_data)} rows from the database.")
-    return render_template("index.html", data=combined_data)
+    return render_template("index.html", data=combined_data, today=today, one_week_from_now=one_week_from_now)
 
 
 if __name__ == "__main__":
