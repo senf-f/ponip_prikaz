@@ -1,108 +1,158 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Informacije o dražbi</title>
+    <title>Dražbe — Pregled nekretnina</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<h1>Informacije o dražbi</h1>
-<h4>Ukupno redaka: {{ data|length }}</h4>
 
-<!-- Filter Dropdown -->
-<label for="statusFilter">Filter by Status nadmetanja:</label>
-<select id="statusFilter" onchange="filterTable()">
-    <option value="Unknown">Unknown</option>
-    {% for row in data | selectattr("status_nadmetanja") | groupby("status_nadmetanja") %}
-    <option value="{{ row.grouper }}">{{ row.grouper }}</option>
-    {% endfor %}
-</select>
+<div class="container">
+    <header class="header">
+        <h1>Dražbe <span>Nekretnina</span></h1>
+        <div class="header-meta">
+            <div class="stat-badge">
+                <span>Ukupno</span>
+                <span class="value">{{ data|length }}</span>
+            </div>
+        </div>
+    </header>
 
-<table id="auctionTable" border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Opis</th>
-        <th>Utvrđena vrijednost</th>
-        <th onclick="sortTable(3)">Početna cijena ⬍</th>
-        <th onclick="sortTable(4)">Završetak nadmetanja ⬍</th>
-        <th onclick="sortTable(5)">Broj uplatitelja ⬍</th>
-        <th onclick="sortTable(6)">Iznos najviše ponude ⬍</th>
-        <th>Status nadmetanja</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for row in data %}
-    <tr>
-        <td>{{ row.id }}</td>
-        <td>{{ row.opis }}<br><a href="{{ row.url }}" target="_blank">{{ row.url }}</a></td>
-        <td>{{ row.utvrdjena_vrijednost }}</td>
-        <td>{{ row.pocetna_cijena }}</td>
-        <td>{{ row.datum_zavrsetka_nadmetanja.strftime('%d.%m.%Y') }}</td>
-        <td>{{ row.broj_uplatitelja }}</td>
-        <td>{{ row.iznos_najvise_ponude or "N/A" }}</td>
-        <td>{{ row.status_nadmetanja }}</td>
-    </tr>
-    {% endfor %}
-    </tbody>
-</table>
+    <div class="controls">
+        <div class="filter-group">
+            <label for="statusFilter">Status</label>
+            <select id="statusFilter" class="filter-select" onchange="filterTable()">
+                <option value="all">Svi statusi</option>
+                <option value="Unknown">Nepoznato</option>
+                {% for row in data | selectattr("status_nadmetanja") | groupby("status_nadmetanja") %}
+                <option value="{{ row.grouper }}">{{ row.grouper }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div class="table-wrapper">
+        <div class="table-scroll">
+            <table id="auctionTable">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Opis</th>
+                    <th class="sortable" onclick="sortTable(2)">Utvrđena vrijednost</th>
+                    <th class="sortable" onclick="sortTable(3)">Početna cijena</th>
+                    <th class="sortable" onclick="sortTable(4)">Završetak</th>
+                    <th class="sortable" onclick="sortTable(5)">Uplatitelji</th>
+                    <th class="sortable" onclick="sortTable(6)">Najviša ponuda</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in data %}
+                <tr>
+                    <td class="col-id">{{ row.id }}</td>
+                    <td class="col-desc">
+                        <div class="desc-text">{{ row.opis }}</div>
+                        {% if row.url %}
+                        <a href="{{ row.url }}" target="_blank" class="desc-link">Otvori →</a>
+                        {% endif %}
+                    </td>
+                    <td class="col-currency">{{ "{:,.0f}".format(row.utvrdjena_vrijednost) }} €</td>
+                    <td class="col-currency highlight">{{ "{:,.0f}".format(row.pocetna_cijena) }} €</td>
+                    <td class="col-date">{{ row.datum_zavrsetka_nadmetanja.strftime('%d.%m.%Y') }}</td>
+                    <td class="col-number">{{ row.broj_uplatitelja or "—" }}</td>
+                    <td class="col-currency">{{ row.iznos_najvise_ponude or "—" }}</td>
+                    <td>
+                        {% if row.status_nadmetanja %}
+                        <span class="status-badge {% if 'završ' in (row.status_nadmetanja|lower) %}completed{% elif 'aktiv' in (row.status_nadmetanja|lower) %}active{% elif 'neuspje' in (row.status_nadmetanja|lower) %}failed{% else %}unknown{% endif %}">
+                            {{ row.status_nadmetanja }}
+                        </span>
+                        {% else %}
+                        <span class="status-badge unknown">N/A</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% if not data %}
+        <div class="empty-state">
+            <h3>Nema podataka</h3>
+            <p>Baza podataka je prazna ili nije povezana.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
 
 <script>
-    function sortTable(n) {
-        let table = document.getElementById("auctionTable");
-        let rows = Array.from(table.rows).slice(1);
-        let asc = table.dataset.sortOrder !== "asc";
+let currentSort = { col: null, asc: true };
 
-        rows.sort((rowA, rowB) => {
-            let cellA = rowA.cells[n].innerText.trim();
-            let cellB = rowB.cells[n].innerText.trim();
+function sortTable(n) {
+    const table = document.getElementById("auctionTable");
+    const thead = table.querySelector("thead tr");
+    const rows = Array.from(table.tBodies[0].rows);
 
-            // Handle Date Sorting (Column 4)
-            if (n === 4) {
-                let dateA = parseDate(cellA);
-                let dateB = parseDate(cellB);
-                return asc ? dateA - dateB : dateB - dateA;
-            }
+    // Toggle direction
+    if (currentSort.col === n) {
+        currentSort.asc = !currentSort.asc;
+    } else {
+        currentSort.col = n;
+        currentSort.asc = true;
+    }
 
-            // Handle Numeric Sorting
-            let numA = parseFloat(cellA.replace(',', ''));
-            let numB = parseFloat(cellB.replace(',', ''));
+    // Update header classes
+    thead.querySelectorAll("th").forEach((th, i) => {
+        th.classList.remove("sort-asc", "sort-desc");
+        if (i === n) {
+            th.classList.add(currentSort.asc ? "sort-asc" : "sort-desc");
+        }
+    });
 
-            if (!isNaN(numA) && !isNaN(numB)) {
-                return asc ? numA - numB : numB - numA;
-            } else {
-                return asc ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
-            }
-        });
+    rows.sort((a, b) => {
+        let cellA = a.cells[n].innerText.trim();
+        let cellB = b.cells[n].innerText.trim();
 
-        // Append sorted rows back to the table
-        for (let row of rows) {
-            table.tBodies[0].appendChild(row);
+        // Date sorting (DD.MM.YYYY)
+        if (n === 4) {
+            return currentSort.asc
+                ? parseDate(cellA) - parseDate(cellB)
+                : parseDate(cellB) - parseDate(cellA);
         }
 
-        table.dataset.sortOrder = asc ? "asc" : "desc";
-    }
+        // Numeric (strip currency symbols, commas)
+        let numA = parseFloat(cellA.replace(/[^\d.-]/g, ''));
+        let numB = parseFloat(cellB.replace(/[^\d.-]/g, ''));
 
-    // ✅ Corrected function to parse 'DD.MM.YYYY' format into a Date object
-    function parseDate(dateStr) {
-        let parts = dateStr.split(".");
-        return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
-    }
-
-    function filterTable() {
-        let filter = document.getElementById("statusFilter").value.toLowerCase();
-        let table = document.getElementById("auctionTable");
-        let rows = table.getElementsByTagName("tr");
-
-    for (let i = 1; i < rows.length; i++) {
-        let status = rows[i].cells[7].innerText.toLowerCase();
-        rows[i].style.display = (filter === "all" || status === filter) ? "" : "none";
+        if (!isNaN(numA) && !isNaN(numB)) {
+            return currentSort.asc ? numA - numB : numB - numA;
         }
-    }
+
+        return currentSort.asc
+            ? cellA.localeCompare(cellB)
+            : cellB.localeCompare(cellA);
+    });
+
+    const tbody = table.tBodies[0];
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+function parseDate(dateStr) {
+    const parts = dateStr.split(".");
+    return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0]));
+}
+
+function filterTable() {
+    const filter = document.getElementById("statusFilter").value.toLowerCase();
+    const rows = document.querySelectorAll("#auctionTable tbody tr");
+
+    rows.forEach(row => {
+        const status = row.cells[7].innerText.trim().toLowerCase();
+        row.style.display = (filter === "all" || status === filter) ? "" : "none";
+    });
+}
 </script>
-
 
 </body>
 </html>
-
