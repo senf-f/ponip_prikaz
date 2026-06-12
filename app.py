@@ -1,5 +1,6 @@
 import os
 from datetime import datetime, timedelta
+from pathlib import Path
 
 from dotenv import load_dotenv
 from flask import Flask, render_template
@@ -15,8 +16,8 @@ app = Flask(__name__)
 if ENVIRONMENT == "production":
     app.config["SQLALCHEMY_DATABASE_URI"] = os.getenv("SQLALCHEMY_DATABASE_URI")
 else:
-    app.config[
-        "SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.getcwd()}/../ponip_scraper_v2/test_database.db"  # Default to SQLite for development
+    db_path = Path(__file__).resolve().parent.parent / "ponip_scraper_v2" / "test_database.db"
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
@@ -34,12 +35,13 @@ def index():
         SalesInfo.broj_uplatitelja,
         SalesInfo.iznos_najvise_ponude,
         SalesInfo.status_nadmetanja,
+        SalesInfo.url,
     ).outerjoin(SalesInfo, Property.id == cast(SalesInfo.id, Integer)).all()
 
     today = datetime.now().date()
     one_week_from_now = today + timedelta(weeks=1)
 
-    print(f"[MM] Fetched {len(combined_data)} rows from the database.")
+    app.logger.info(f"Fetched {len(combined_data)} rows from the database.")
     return render_template("index.html", data=combined_data, today=today, one_week_from_now=one_week_from_now)
 
 
